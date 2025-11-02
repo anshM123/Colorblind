@@ -6,6 +6,7 @@ import { HowItWorks } from "@/components/HowItWorks";
 import { StatsSection } from "@/components/StatsSection";
 import { Footer } from "@/components/Footer";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { EyeSaverToggle } from "@/components/EyeSaverToggle";
 
 export default function Home() {
   const analyzerRef = useRef<HTMLDivElement>(null);
@@ -19,7 +20,10 @@ export default function Home() {
       <header className="fixed top-0 left-0 right-0 z-50 border-b bg-background/80 backdrop-blur-sm">
         <div className="max-w-7xl mx-auto px-4 py-4 flex justify-between items-center">
           <h1 className="text-xl font-bold">ColorSense</h1>
-          <ThemeToggle />
+          <div className="flex items-center gap-2">
+            <EyeSaverToggle />
+            <ThemeToggle />
+          </div>
         </div>
       </header>
 

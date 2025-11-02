@@ -244,6 +244,10 @@
   body {
     @apply bg-background text-foreground font-sans antialiased;
   }
+
+  html.eye-saver-mode {
+    filter: var(--eye-saver-filter, none);
+  }
 }
 
 /**

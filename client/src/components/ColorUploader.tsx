@@ -1,5 +1,5 @@
-import { Upload, X, Image as ImageIcon } from "lucide-react";
-import { useState, useCallback } from "react";
+import { Upload, X, Image as ImageIcon, Camera } from "lucide-react";
+import { useState, useCallback, useRef } from "react";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 
@@ -10,6 +10,9 @@ interface ColorUploaderProps {
 export function ColorUploader({ onImageUpload }: ColorUploaderProps) {
   const [isDragging, setIsDragging] = useState(false);
   const [preview, setPreview] = useState<string | null>(null);
+  const [showCamera, setShowCamera] = useState(false);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const streamRef = useRef<MediaStream | null>(null);
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -49,7 +52,81 @@ export function ColorUploader({ onImageUpload }: ColorUploaderProps) {
 
   const clearPreview = () => {
     setPreview(null);
+    stopCamera();
   };
+
+  const startCamera = async () => {
+    try {
+      const stream = await navigator.mediaDevices.getUserMedia({ 
+        video: { facingMode: 'environment' } 
+      });
+      streamRef.current = stream;
+      if (videoRef.current) {
+        videoRef.current.srcObject = stream;
+      }
+      setShowCamera(true);
+    } catch (error) {
+      console.error('Error accessing camera:', error);
+      alert('Unable to access camera. Please check permissions.');
+    }
+  };
+
+  const stopCamera = () => {
+    if (streamRef.current) {
+      streamRef.current.getTracks().forEach(track => track.stop());
+      streamRef.current = null;
+    }
+    setShowCamera(false);
+  };
+
+  const capturePhoto = () => {
+    if (videoRef.current) {
+      const canvas = document.createElement('canvas');
+      canvas.width = videoRef.current.videoWidth;
+      canvas.height = videoRef.current.videoHeight;
+      const ctx = canvas.getContext('2d');
+      if (ctx) {
+        ctx.drawImage(videoRef.current, 0, 0);
+        canvas.toBlob((blob) => {
+          if (blob) {
+            const file = new File([blob], 'camera-photo.jpg', { type: 'image/jpeg' });
+            handleFile(file);
+            stopCamera();
+          }
+        }, 'image/jpeg');
+      }
+    }
+  };
+
+  if (showCamera) {
+    return (
+      <Card className="relative overflow-hidden">
+        <video
+          ref={videoRef}
+          autoPlay
+          playsInline
+          className="w-full h-auto max-h-96 object-contain"
+        />
+        <div className="absolute bottom-4 left-0 right-0 flex justify-center gap-3">
+          <Button
+            onClick={capturePhoto}
+            data-testid="button-capture-photo"
+            size="lg"
+          >
+            <Camera className="h-5 w-5 mr-2" />
+            Capture Photo
+          </Button>
+          <Button
+            variant="secondary"
+            onClick={stopCamera}
+            data-testid="button-cancel-camera"
+          >
+            Cancel
+          </Button>
+        </div>
+      </Card>
+    );
+  }
 
   if (preview) {
     return (
@@ -111,6 +188,20 @@ export function ColorUploader({ onImageUpload }: ColorUploaderProps) {
           Supports: JPG, PNG, WebP, GIF
         </div>
       </label>
+      
+      <div className="absolute bottom-8 left-0 right-0 flex justify-center">
+        <Button
+          variant="outline"
+          onClick={(e) => {
+            e.preventDefault();
+            startCamera();
+          }}
+          data-testid="button-open-camera"
+        >
+          <Camera className="h-4 w-4 mr-2" />
+          Use Camera
+        </Button>
+      </div>
     </div>
   );
 }
