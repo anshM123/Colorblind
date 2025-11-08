@@ -1,12 +1,18 @@
 import { defineConfig } from 'vite'
 import react from '@vitejs/plugin-react'
+import { resolve } from 'path'
 
-// ✅ Fix base for GitHub Pages
 export default defineConfig({
   plugins: [react()],
-  base: '/Colorblind/',  // <-- MUST match your repo name exactly
+  root: 'client',
+  base: '/Colorblind/',
+  resolve: {
+    alias: {
+      '@': resolve(__dirname, 'client/src'), // 👈 This fixes "@/..." imports
+    },
+  },
   build: {
-    outDir: '../docs',   // output to docs folder for GitHub Pages
+    outDir: '../docs',
     emptyOutDir: true,
   },
 })
