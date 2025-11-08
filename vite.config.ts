@@ -1,18 +1,18 @@
-import { defineConfig } from 'vite'
-import react from '@vitejs/plugin-react'
-import { resolve } from 'path'
+import { defineConfig } from "vite";
+import react from "@vitejs/plugin-react";
+import path from "path";
 
 export default defineConfig({
+  base: "/Colorblind/",
   plugins: [react()],
-  root: 'client',
-  base: '/Colorblind/',
   resolve: {
     alias: {
-      '@': resolve(__dirname, 'client/src'), // 👈 This fixes "@/..." imports
+      "@": path.resolve(__dirname, "client", "src"),
     },
   },
+  root: path.resolve(__dirname, "client"),
   build: {
-    outDir: '../docs',
+    outDir: path.resolve(__dirname, "docs"),
     emptyOutDir: true,
   },
-})
+});
