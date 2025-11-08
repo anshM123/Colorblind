@@ -15,4 +15,7 @@ export default defineConfig({
     outDir: path.resolve(__dirname, "docs"),
     emptyOutDir: true,
   },
+  server: {
+    historyApiFallback: true,
+  },
 });
